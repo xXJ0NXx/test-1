@@ -22,6 +22,9 @@
   <script src="eagswebrtc.js"></script>
   <script src="worker_bootstrap.js"></script>
 
+  <!-- Local single player classes -->
+  <script src="classes_server.js"></script>
+
   <style>
     /* Single Player Menu */
     #singleplayer-menu { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; z-index:10000; font-family:'Minecraft', monospace, sans-serif; }
@@ -49,7 +52,7 @@
     #create-world-form label { color:#fff; display:block; margin-top:10px; }
 
     /* Floating Single Player Button */
-    .sp-float-btn { position: fixed; top:20px; right:20px; z-index:99999; background:#4a4; border:2px solid #6c6; color:#fff; font-family:'Minecraft', monospace, sans-serif; font-size:16px; padding:12px 20px; border-radius:8px; cursor:pointer; box-shadow:0 0 10px rgba(0,0,0,0.5); display:none; }
+    .sp-float-btn { position: fixed; top:20px; right:20px; z-index:99999; background:#4a4; border:2px solid #6c6; color:#fff; font-family:'Minecraft', monospace, sans-serif; font-size:16px; padding:12px 20px; border-radius:8px; cursor:pointer; box-shadow:0 0 10px rgba(0,0,0,0.5); display:block; }
     .sp-float-btn:hover { background:#5b5; border-color:#8e8; }
     .sp-float-btn:active { background:#3a3; }
   </style>
@@ -89,7 +92,7 @@ var name="Ayuncraft", motd="A public 1.5.2 server", ip="pixelcraft.me";
 // === Single Player Button / Menu ===
 function openSinglePlayerAndHide(){ document.getElementById('open-singleplayer-btn').style.display='none'; showSinglePlayerMenu(); }
 function showSinglePlayerMenu(){ document.getElementById('singleplayer-menu').classList.add('active'); refreshWorldList(); if(document.exitPointerLock) document.exitPointerLock(); }
-function closeSinglePlayerMenu(){ document.getElementById('singleplayer-menu').classList.remove('active'); document.getElementById('create-world-form').classList.remove('active'); document.getElementById('open-singleplayer-btn').style.display='block'; }
+function closeSinglePlayerMenu(){ document.getElementById('singleplayer-menu').classList.remove('active'); document.getElementById('create-world-form').classList.remove('active'); }
 
 // === Worlds ===
 const WORLDS_KEY='minecraft_worlds';
@@ -126,44 +129,16 @@ function createWorld(){
 }
 function loadWorld(i){ const worlds=getWorlds(); const w=worlds[i]; if(!w) return alert('World not found'); w.lastPlayed=Date.now(); saveWorlds(worlds); closeSinglePlayerMenu(); startSinglePlayerWithWorld(w); }
 
-// === FIXED: Start Single Player safely ===
-function startSinglePlayerWithWorld(world) {
-    if(typeof classes_server !== 'undefined'){
-        try{
-            const srv = classes_server;
-
-            if(srv.createWorld) srv.createWorld(world.name, world.seed||null);
-            if(srv.generateChunk) srv.generateChunk(0,0);
-            if(srv.spawnPlayer) srv.spawnPlayer(world.name);
-            if(srv.start) srv.start(world.seed||null);
-
-            console.log('Single player world loaded successfully:', world.name);
-        }catch(e){
-            console.error('Error starting single player:', e);
-            alert('Failed to start single player: ' + e.message);
-        }
-    } else if(typeof startIntegratedServer === 'function'){
-        startIntegratedServer(world.seed||null);
-    } else {
-        console.error('classes_server.js missing');
-        alert('Single player unavailable. Make sure classes_server.js is loaded.');
-    }
+// === Start Single Player ===
+function startSinglePlayerWithWorld(world){
+  if(typeof classes_server!=='undefined'){
+    try{
+      if(classes_server.start) classes_server.start(world.seed||null);
+      console.log('Single player world loaded:', world.name);
+    }catch(e){ console.error('Error starting single player:',e); alert('Failed to start single player: '+e.message); }
+  } else if(typeof startIntegratedServer==='function'){ startIntegratedServer(world.seed||null); }
+  else{ console.error('classes_server.js missing'); alert('Single player unavailable.'); }
 }
-
-// === Load server classes locally from GitHub ===
-function loadServerClasses(){
-  return new Promise((resolve,reject)=>{
-    if(typeof classes_server !== 'undefined'){ resolve(); return; }
-    const s=document.createElement('script'); 
-    s.src='https://raw.githubusercontent.com/xXJ0NXx/test-1/refs/heads/main/classes_server.js';
-    s.onload=()=>{ if(typeof classes_server !== 'undefined'){ console.log('✓ classes_server.js loaded'); resolve(); } else reject(new Error('classes_server not found')); };
-    s.onerror=()=>reject(new Error('Failed to load classes_server.js'));
-    document.head.appendChild(s);
-  });
-}
-
-// === Initialize Single Player Button ===
-loadServerClasses().then(()=>{ document.getElementById('open-singleplayer-btn').style.display='block'; console.log('✓ Single Player ready'); }).catch(err=>{ console.error(err); alert('Single Player unavailable. Ensure classes_server.js is present.'); });
 
 // === Load modded.js and unmodded.js locally ===
 function loadScript(src){ return new Promise((resolve,reject)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>resolve(); s.onerror=()=>reject(new Error('Failed to load '+src)); document.head.appendChild(s); }); }
