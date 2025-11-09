@@ -18,10 +18,6 @@
   <script src="asn1-parser.js"></script>
   <script src="music.js"></script>
   
-  <!-- Split class logic - load unmodded first, then modded -->
-  <script src="unmodded.js"></script>
-  <script src="modded.js"></script>
-  
   <!-- Optional Eaglercraft networking -->
   <script src="eagswebrtc.js"></script>
 </head>
@@ -29,7 +25,44 @@
 <script>
 var name="PixelCraft", motd="A public 1.5.2 server", ip="pixelcraft.me";
 
-window.addEventListener("load", function(){
+// Load scripts dynamically with fallback support
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = () => resolve(src);
+    script.onerror = () => {
+      console.warn(`Optional script not loaded: ${src}`);
+      resolve(null); // Resolve anyway, don't reject
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// Load unmodded.js first (required base), then modded.js (modifications/overrides)
+loadScript('unmodded.js').then((unmoddedResult) => {
+  if (!unmoddedResult) {
+    throw new Error('unmodded.js failed to load - this file is required');
+  }
+  console.log('✓ unmodded.js loaded (vanilla base)');
+  
+  // Now load modded.js to apply modifications/additions
+  return loadScript('modded.js');
+}).then((moddedResult) => {
+  if (!moddedResult) {
+    throw new Error('modded.js failed to load - this file is required');
+  }
+  console.log('✓ modded.js loaded (modifications applied)');
+  
+  // Both files loaded successfully, initialize game
+  initGame();
+}).catch((error) => {
+  console.error('Failed to load game files:', error);
+  document.getElementById('game_frame').innerHTML = 
+    '<div style="color:red;padding:20px;font-family:sans-serif;"><strong>Error: Game files failed to load</strong><br><br>' + error.message + '<br><br>Please ensure both unmodded.js and modded.js are present.</div>';
+});
+
+function initGame() {
   document.requestPointerLock = document.requestPointerLock || function(){};
   document.exitPointerLock = document.exitPointerLock || function(){};
   
@@ -55,7 +88,13 @@ window.addEventListener("load", function(){
   if(q.has("server")) window.minecraftOpts.push(q.get("server"));
   
   // Initialize the game
-  main();
-});
+  if (typeof main === 'function') {
+    main();
+  } else {
+    console.error('main() function not found - check if game files loaded correctly');
+    document.getElementById('game_frame').innerHTML = 
+      '<div style="color:red;padding:20px;font-family:sans-serif;">Error: main() function not found. Game files may be corrupted.</div>';
+  }
+}
 </script>
 </html>
