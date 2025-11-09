@@ -128,19 +128,21 @@ function loadWorld(i){ const worlds=getWorlds(); const w=worlds[i]; if(!w) retur
 
 // === FIXED: Start Single Player safely ===
 function startSinglePlayerWithWorld(world) {
-    if (typeof classes !== 'undefined' && classes.server) {
-        try {
-            const srv = classes.server;
-            if (srv.createWorld) srv.createWorld(world.name, world.seed||null);
-            if (srv.generateChunk) srv.generateChunk(0,0);
-            if (srv.spawnPlayer) srv.spawnPlayer(world.name);
-            if (srv.start) srv.start(world.seed||null);
+    if(typeof classes_server !== 'undefined'){
+        try{
+            const srv = classes_server;
+
+            if(srv.createWorld) srv.createWorld(world.name, world.seed||null);
+            if(srv.generateChunk) srv.generateChunk(0,0);
+            if(srv.spawnPlayer) srv.spawnPlayer(world.name);
+            if(srv.start) srv.start(world.seed||null);
+
             console.log('Single player world loaded successfully:', world.name);
-        } catch(e) {
+        }catch(e){
             console.error('Error starting single player:', e);
             alert('Failed to start single player: ' + e.message);
         }
-    } else if (typeof startIntegratedServer==='function') {
+    } else if(typeof startIntegratedServer === 'function'){
         startIntegratedServer(world.seed||null);
     } else {
         console.error('classes_server.js missing');
@@ -148,12 +150,13 @@ function startSinglePlayerWithWorld(world) {
     }
 }
 
-// === Load server classes locally ===
+// === Load server classes locally from GitHub ===
 function loadServerClasses(){
   return new Promise((resolve,reject)=>{
-    if(typeof classes!=='undefined' && classes.server){ resolve(); return; }
-    const s=document.createElement('script'); s.src='classes_server.js';
-    s.onload=()=>{ if(typeof classes!=='undefined' && classes.server){ console.log('✓ classes_server.js loaded'); resolve(); } else reject(new Error('classes.server not found')); };
+    if(typeof classes_server !== 'undefined'){ resolve(); return; }
+    const s=document.createElement('script'); 
+    s.src='https://raw.githubusercontent.com/xXJ0NXx/test-1/refs/heads/main/classes_server.js';
+    s.onload=()=>{ if(typeof classes_server !== 'undefined'){ console.log('✓ classes_server.js loaded'); resolve(); } else reject(new Error('classes_server not found')); };
     s.onerror=()=>reject(new Error('Failed to load classes_server.js'));
     document.head.appendChild(s);
   });
@@ -179,7 +182,7 @@ function initGame(){
   if(typeof main==='function'){ main(); setTimeout(()=>setupSinglePlayerHook(),2000); }
   else document.getElementById('game_frame').innerHTML='<div style="color:red;padding:20px;font-family:sans-serif;">Error: main() not found</div>';
 }
-function setupSinglePlayerHook(){ window.singlePlayerAvailable=(typeof classes!=='undefined' && classes.server) || typeof startIntegratedServer==='function'; if(window.singlePlayerAvailable) console.log('✓ Single player ready'); else console.warn('⚠ classes.server.js missing'); }
+function setupSinglePlayerHook(){ window.singlePlayerAvailable=(typeof classes_server!=='undefined') || typeof startIntegratedServer==='function'; if(window.singlePlayerAvailable) console.log('✓ Single player ready'); else console.warn('⚠ classes_server.js missing'); }
 
 window.openSinglePlayer=showSinglePlayerMenu;
 document.addEventListener('keydown',(e)=>{ if(e.key==='F2'){ e.preventDefault(); showSinglePlayerMenu(); } });
