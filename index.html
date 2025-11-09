@@ -112,10 +112,20 @@ function refreshWorldList(){
 }
 function showCreateWorldForm(){ document.getElementById('create-world-form').classList.add('active'); document.getElementById('world-name-input').focus(); }
 function cancelCreateWorld(){ document.getElementById('create-world-form').classList.remove('active'); document.getElementById('world-name-input').value=''; document.getElementById('world-seed-input').value=''; }
+
+// === Create World with Auto Seed ===
 function createWorld(){
   const n=document.getElementById('world-name-input').value.trim()||'New World';
-  const s=document.getElementById('world-seed-input').value.trim()||null;
-  const worlds=getWorlds(); const w={name:n,seed:s,created:Date.now(),lastPlayed:Date.now()};
+  let s=document.getElementById('world-seed-input').value.trim();
+
+  // Automatic seed generation if blank
+  if(!s){
+    s = Math.floor(Math.random() * 0xFFFFFFFF) - 0x80000000; // 32-bit signed integer
+  }
+
+  const worlds=getWorlds(); 
+  const w={name:n,seed:s,created:Date.now(),lastPlayed:Date.now()};
+
   worlds.push(w); 
   if(saveWorlds(worlds)){ 
       cancelCreateWorld(); 
@@ -125,6 +135,7 @@ function createWorld(){
       console.log('World created & loaded:',w); 
   }
 }
+
 function loadWorld(i){ const worlds=getWorlds(); const w=worlds[i]; if(!w) return alert('World not found'); w.lastPlayed=Date.now(); saveWorlds(worlds); closeSinglePlayerMenu(); startSinglePlayerWithWorld(w); }
 
 // === Start Single Player ===
