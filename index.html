@@ -17,12 +17,10 @@
   <script src="jsbn/rsa2.js"></script>
   <script src="asn1-parser.js"></script>
   <script src="music.js"></script>
-
-  <!-- Optional Eaglercraft networking -->
   <script src="eagswebrtc.js"></script>
   <script src="worker_bootstrap.js"></script>
 
-  <!-- Local single player classes -->
+  <!-- Single Player classes loaded first -->
   <script src="classes_server.js"></script>
 
   <style>
@@ -131,13 +129,13 @@ function loadWorld(i){ const worlds=getWorlds(); const w=worlds[i]; if(!w) retur
 
 // === Start Single Player ===
 function startSinglePlayerWithWorld(world){
-  if(typeof classes_server!=='undefined'){
-    try{
-      if(classes_server.start) classes_server.start(world.seed||null);
-      console.log('Single player world loaded:', world.name);
-    }catch(e){ console.error('Error starting single player:',e); alert('Failed to start single player: '+e.message); }
-  } else if(typeof startIntegratedServer==='function'){ startIntegratedServer(world.seed||null); }
-  else{ console.error('classes_server.js missing'); alert('Single player unavailable.'); }
+  if(typeof classes !== 'undefined' && classes.server){
+    classes.server.start(world.seed||null);
+    console.log('Single player world loaded:', world.name);
+  } else {
+    console.error('classes_server.js missing');
+    alert('Single player unavailable.');
+  }
 }
 
 // === Load modded.js and unmodded.js locally ===
@@ -157,7 +155,7 @@ function initGame(){
   if(typeof main==='function'){ main(); setTimeout(()=>setupSinglePlayerHook(),2000); }
   else document.getElementById('game_frame').innerHTML='<div style="color:red;padding:20px;font-family:sans-serif;">Error: main() not found</div>';
 }
-function setupSinglePlayerHook(){ window.singlePlayerAvailable=(typeof classes_server!=='undefined') || typeof startIntegratedServer==='function'; if(window.singlePlayerAvailable) console.log('✓ Single player ready'); else console.warn('⚠ classes_server.js missing'); }
+function setupSinglePlayerHook(){ window.singlePlayerAvailable=(typeof classes!=='undefined' && classes.server); if(window.singlePlayerAvailable) console.log('✓ Single player ready'); else console.warn('⚠ classes_server.js missing'); }
 
 window.openSinglePlayer=showSinglePlayerMenu;
 document.addEventListener('keydown',(e)=>{ if(e.key==='F2'){ e.preventDefault(); showSinglePlayerMenu(); } });
