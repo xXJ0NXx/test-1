@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Ayuncraft with SinglePlayer</title>
+  <title>PixelCraft + Eaglercraft Hybrid (Single Player Enabled)</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="A hybrid of PixelCraft and Eaglercraft. Play Minecraft 1.5.2 in your browser with multiplayer, single player, and RSA encryption." />
@@ -431,22 +431,16 @@ function loadScript(src, required = true) {
   });
 }
 
-// Show loading indicator
-document.getElementById('game_frame').innerHTML = '<div id="loading-status" style="color:white;padding:20px;font-family:monospace;background:#000;">Loading game files...</div>';
-
 console.log('Starting game file loading sequence...');
 
 loadScript('modded.js', true).then(() => {
   console.log('✓ modded.js loaded successfully');
-  document.getElementById('loading-status').innerHTML += '<br>✓ modded.js loaded';
   console.log('✓ Single player support enabled!');
   console.log('Initializing game...');
   
-  document.getElementById('loading-status').innerHTML += '<br>✓ Single player support enabled!<br>Starting game...';
-  
   setTimeout(() => {
     initGame();
-  }, 1000);
+  }, 100);
 }).catch((error) => {
   console.error('❌ FATAL ERROR during file loading:', error);
   document.getElementById('game_frame').innerHTML = 
