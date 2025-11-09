@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="A hybrid of PixelCraft and Eaglercraft. Play Minecraft 1.5.2 in your browser with multiplayer and RSA encryption." />
   <meta name="author" content="lax1dude + ayunami" />
-
+  
   <!-- PixelCraft core libraries -->
   <script src="jsbn/jsbn.js"></script>
   <script src="jsbn/jsbn2.js"></script>
@@ -17,22 +17,22 @@
   <script src="jsbn/rsa2.js"></script>
   <script src="asn1-parser.js"></script>
   <script src="music.js"></script>
-
-  <!-- Shared class logic -->
-  <script src="classes.js"></script>
+  
+  <!-- Split class logic - load unmodded first, then modded -->
+  <script src="unmodded.js"></script>
+  <script src="modded.js"></script>
+  
   <!-- Optional Eaglercraft networking -->
   <script src="eagswebrtc.js"></script>
 </head>
-
 <body style="margin:0;width:100vw;height:100vh;" id="game_frame"></body>
-
 <script>
 var name="PixelCraft", motd="A public 1.5.2 server", ip="pixelcraft.me";
 
 window.addEventListener("load", function(){
   document.requestPointerLock = document.requestPointerLock || function(){};
   document.exitPointerLock = document.exitPointerLock || function(){};
-
+  
   // Combine PixelCraft startup with Eaglercraft relays
   const relayId = Math.floor(Math.random() * 3);
   window.eaglerRelays = [
@@ -40,7 +40,7 @@ window.addEventListener("load", function(){
     { addr: "wss://relay.lax1dude.net/", name: "relay #2", primary: relayId == 1 },
     { addr: "wss://relay.shhnowisnottheti.me/", name: "relay #3", primary: relayId == 2 }
   ];
-
+  
   // PixelCraft startup configuration
   window.minecraftOpts = [
     "game_frame","assets.epk",
@@ -49,11 +49,12 @@ window.addEventListener("load", function(){
       .replace("namehere", String.fromCharCode(name.length)+name)
       .replace("iphere", String.fromCharCode(ip.length)+ip))
   ];
-
+  
   // Support URL ?server= query parameter
   var q = new URLSearchParams(window.location.search);
   if(q.has("server")) window.minecraftOpts.push(q.get("server"));
-
+  
+  // Initialize the game
   main();
 });
 </script>
