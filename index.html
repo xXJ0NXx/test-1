@@ -20,7 +20,6 @@
 
   <!-- Optional Eaglercraft networking -->
   <script src="eagswebrtc.js"></script>
-  <!-- Worker bootstrap -->
   <script src="worker_bootstrap.js"></script>
 
   <style>
@@ -116,15 +115,37 @@ function createWorld(){
   const n=document.getElementById('world-name-input').value.trim()||'New World';
   const s=document.getElementById('world-seed-input').value.trim()||null;
   const worlds=getWorlds(); const w={name:n,seed:s,created:Date.now(),lastPlayed:Date.now()};
-  worlds.push(w); if(saveWorlds(worlds)){ cancelCreateWorld(); refreshWorldList(); closeSinglePlayerMenu(); startSinglePlayerWithWorld(w); console.log('World created & loaded:',w); }
+  worlds.push(w); 
+  if(saveWorlds(worlds)){ 
+      cancelCreateWorld(); 
+      refreshWorldList(); 
+      closeSinglePlayerMenu(); 
+      startSinglePlayerWithWorld(w); 
+      console.log('World created & loaded:',w); 
+  }
 }
 function loadWorld(i){ const worlds=getWorlds(); const w=worlds[i]; if(!w) return alert('World not found'); w.lastPlayed=Date.now(); saveWorlds(worlds); closeSinglePlayerMenu(); startSinglePlayerWithWorld(w); }
-function startSinglePlayerWithWorld(world){
-  if(typeof classes!=='undefined' && classes.server){
-    try{ if(typeof classes.server.createWorld==='function'){ classes.server.createWorld(world.name,world.seed||null); classes.server.start(world.seed||null); }else classes.server.start(world.seed||null); }
-    catch(e){ console.error(e); alert('Failed to start single player: '+e.message);}
-  } else if(typeof startIntegratedServer==='function'){ startIntegratedServer(world.seed||null); }
-  else{ console.error('classes_server.js missing'); alert('Single player unavailable'); }
+
+// === FIXED: Start Single Player safely ===
+function startSinglePlayerWithWorld(world) {
+    if (typeof classes !== 'undefined' && classes.server) {
+        try {
+            const srv = classes.server;
+            if (srv.createWorld) srv.createWorld(world.name, world.seed||null);
+            if (srv.generateChunk) srv.generateChunk(0,0);
+            if (srv.spawnPlayer) srv.spawnPlayer(world.name);
+            if (srv.start) srv.start(world.seed||null);
+            console.log('Single player world loaded successfully:', world.name);
+        } catch(e) {
+            console.error('Error starting single player:', e);
+            alert('Failed to start single player: ' + e.message);
+        }
+    } else if (typeof startIntegratedServer==='function') {
+        startIntegratedServer(world.seed||null);
+    } else {
+        console.error('classes_server.js missing');
+        alert('Single player unavailable. Make sure classes_server.js is loaded.');
+    }
 }
 
 // === Load server classes locally ===
@@ -139,7 +160,7 @@ function loadServerClasses(){
 }
 
 // === Initialize Single Player Button ===
-loadServerClasses().then(()=>{ const btn=document.getElementById('open-singleplayer-btn'); btn.style.display='block'; console.log('✓ Single Player ready'); }).catch(err=>{ console.error(err); alert('Single Player unavailable. Ensure classes_server.js is present.'); });
+loadServerClasses().then(()=>{ document.getElementById('open-singleplayer-btn').style.display='block'; console.log('✓ Single Player ready'); }).catch(err=>{ console.error(err); alert('Single Player unavailable. Ensure classes_server.js is present.'); });
 
 // === Load modded.js and unmodded.js locally ===
 function loadScript(src){ return new Promise((resolve,reject)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>resolve(); s.onerror=()=>reject(new Error('Failed to load '+src)); document.head.appendChild(s); }); }
