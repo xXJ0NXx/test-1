@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>PixelCraft + Eaglercraft Hybrid (Single Player Enabled)</title>
+  <title>Ayuncraft With SinglePlayer</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A hybrid of PixelCraft and Eaglercraft. Play Minecraft 1.5.2 in your browser with multiplayer, single player, and RSA encryption." />
+  <meta name="description" content="Ayuncraft hybrid. Play Minecraft 1.5.2 in your browser with multiplayer, single player, and RSA encryption." />
   <meta name="author" content="lax1dude + ayunami" />
 
   <!-- PixelCraft core libraries -->
@@ -26,23 +26,9 @@
 
   <style>
     /* Single Player Menu */
-    #singleplayer-menu {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      z-index: 10000;
-      font-family: 'Minecraft', monospace, sans-serif;
-    }
+    #singleplayer-menu { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; z-index:10000; font-family:'Minecraft', monospace, sans-serif; }
     #singleplayer-menu.active { display:flex; justify-content:center; align-items:center; flex-direction:column; }
-    .sp-container {
-      background:#333; border:2px solid #666; padding:20px;
-      max-width:600px; width:90%; max-height:80vh; overflow-y:auto;
-      box-shadow:0 0 20px rgba(0,0,0,0.5);
-    }
+    .sp-container { background:#333; border:2px solid #666; padding:20px; max-width:600px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 0 20px rgba(0,0,0,0.5); }
     .sp-title { color:#fff; font-size:24px; margin-bottom:20px; text-align:center; text-shadow:2px 2px 0 #000; }
     .world-list { margin-bottom:20px; max-height:300px; overflow-y:auto; border:1px solid #555; background:#222; }
     .world-item { padding:15px; border-bottom:1px solid #444; cursor:pointer; transition: background 0.2s; color:#fff; }
@@ -61,19 +47,13 @@
     #create-world-form label { color:#fff; display:block; margin-top:10px; }
 
     /* Floating Single Player Button */
-    .sp-float-btn {
-      position: fixed; top:20px; right:20px; z-index:99999;
-      background:#4a4; border:2px solid #6c6; color:#fff;
-      font-family:'Minecraft', monospace, sans-serif; font-size:16px;
-      padding:12px 20px; border-radius:8px; cursor:pointer;
-      box-shadow:0 0 10px rgba(0,0,0,0.5); transition:all 0.2s;
-      display:none; /* hidden until server loaded */
-    }
+    .sp-float-btn { position: fixed; top:20px; right:20px; z-index:99999; background:#4a4; border:2px solid #6c6; color:#fff; font-family:'Minecraft', monospace, sans-serif; font-size:16px; padding:12px 20px; border-radius:8px; cursor:pointer; box-shadow:0 0 10px rgba(0,0,0,0.5); transition:all 0.2s; display:none; }
     .sp-float-btn:hover { background:#5b5; border-color:#8e8; }
     .sp-float-btn:active { background:#3a3; }
   </style>
 </head>
 <body style="margin:0;width:100vw;height:100vh;" id="game_frame">
+
   <!-- Single Player Menu Overlay -->
   <div id="singleplayer-menu">
     <div class="sp-container">
@@ -102,7 +82,7 @@
   <button id="open-singleplayer-btn" class="sp-float-btn" onclick="openSinglePlayerAndHide()">Single Player</button>
 
 <script>
-var name="PixelCraft", motd="A public 1.5.2 server", ip="pixelcraft.me";
+var name="Ayuncraft", motd="A public 1.5.2 server", ip="pixelcraft.me";
 
 // === Floating button handler ===
 function openSinglePlayerAndHide(){
@@ -185,14 +165,14 @@ function startSinglePlayerWithWorld(world){
   else{ console.error('classes_server.js not loaded'); alert('Single player unavailable.'); }
 }
 
-// === Dynamically load classes_server.js ===
+// === Dynamically load classes_server.js from GitHub ===
 function loadServerClasses(){
   return new Promise((resolve,reject)=>{
     if(typeof classes!=='undefined' && classes.server){ resolve(); return; }
     const script=document.createElement('script');
-    script.src='classes_server.js';
-    script.onload=()=>{ if(typeof classes!=='undefined' && classes.server){ resolve(); } else reject(new Error('classes.server not found')); };
-    script.onerror=(e)=>reject(new Error('Failed to load classes_server.js'));
+    script.src='https://raw.githubusercontent.com/xXJ0NXx/test-1/refs/heads/main/classes_server.js';
+    script.onload=()=>{ if(typeof classes!=='undefined' && classes.server){ console.log('✓ classes_server.js loaded from GitHub'); resolve(); } else reject(new Error('classes.server not found')); };
+    script.onerror=(e)=>reject(new Error('Failed to load classes_server.js from GitHub'));
     document.head.appendChild(script);
   });
 }
@@ -210,7 +190,6 @@ loadServerClasses().then(()=>{
 
 // === Game loading (modded.js) ===
 function loadScript(src,required=true){ return new Promise((resolve,reject)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>resolve(); s.onerror=(e)=>required?reject(new Error(src)):resolve(); document.head.appendChild(s); }); }
-
 loadScript('modded.js',true).then(()=>{ setTimeout(()=>{ initGame(); },100); }).catch(error=>{
   document.getElementById('game_frame').innerHTML='<div style="color:red;padding:20px;font-family:sans-serif;"><strong>Error loading modded.js</strong><br>'+error.message+'</div>';
 });
