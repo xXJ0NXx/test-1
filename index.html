@@ -39,22 +39,23 @@ function loadScript(src) {
   });
 }
 
-// Load unmodded.js first (required base), then modded.js (modifications/overrides)
+// Load unmodded.js first, then modded.js sequentially to combine them
 loadScript('unmodded.js').then((unmoddedResult) => {
   if (!unmoddedResult) {
     throw new Error('unmodded.js failed to load - this file is required');
   }
   console.log('✓ unmodded.js loaded (vanilla base)');
   
-  // Now load modded.js to apply modifications/additions
+  // Now load modded.js - it will merge with/override unmodded classes
   return loadScript('modded.js');
 }).then((moddedResult) => {
   if (!moddedResult) {
     throw new Error('modded.js failed to load - this file is required');
   }
-  console.log('✓ modded.js loaded (modifications applied)');
+  console.log('✓ modded.js loaded (merged with base)');
+  console.log('✓ Combined mode active: unmodded.js + modded.js');
   
-  // Both files loaded successfully, initialize game
+  // Both files loaded and combined, initialize game
   initGame();
 }).catch((error) => {
   console.error('Failed to load game files:', error);
