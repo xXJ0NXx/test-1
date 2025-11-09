@@ -25,15 +25,22 @@
 <script>
 var name="PixelCraft", motd="A public 1.5.2 server", ip="pixelcraft.me";
 
-// Load scripts dynamically with fallback support
-function loadScript(src) {
+// Load scripts dynamically - both files are required
+function loadScript(src, required = true) {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = src;
-    script.onload = () => resolve(src);
+    script.onload = () => {
+      console.log(`✓ Successfully loaded: ${src}`);
+      resolve(src);
+    };
     script.onerror = () => {
-      console.warn(`Optional script not loaded: ${src}`);
-      resolve(null); // Resolve anyway, don't reject
+      if (required) {
+        reject(new Error(`Failed to load required file: ${src}`));
+      } else {
+        console.warn(`Optional script not loaded: ${src}`);
+        resolve(null);
+      }
     };
     document.head.appendChild(script);
   });
