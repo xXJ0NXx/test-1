@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="A hybrid of PixelCraft and Eaglercraft. Play Minecraft 1.5.2 in your browser with multiplayer, single player, and RSA encryption." />
   <meta name="author" content="lax1dude + ayunami" />
-  
+
   <!-- PixelCraft core libraries -->
   <script src="jsbn/jsbn.js"></script>
   <script src="jsbn/jsbn2.js"></script>
@@ -17,126 +17,60 @@
   <script src="jsbn/rsa2.js"></script>
   <script src="asn1-parser.js"></script>
   <script src="music.js"></script>
-  
+
   <!-- Optional Eaglercraft networking -->
   <script src="eagswebrtc.js"></script>
-  
-  <!-- Single player support -->
-  <script src="classes_server.js"></script>
-  
+
   <!-- Worker bootstrap -->
   <script src="worker_bootstrap.js"></script>
-  
+
   <style>
-    /* ======== Single Player Menu ======== */
+    /* Single Player Menu */
     #singleplayer-menu {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0,0,0,0.85);
       display: none;
       z-index: 10000;
       font-family: 'Minecraft', monospace, sans-serif;
     }
-    
-    #singleplayer-menu.active {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    
+    #singleplayer-menu.active { display:flex; justify-content:center; align-items:center; flex-direction:column; }
     .sp-container {
-      background: #333;
-      border: 2px solid #666;
-      padding: 20px;
-      max-width: 600px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      background:#333; border:2px solid #666; padding:20px;
+      max-width:600px; width:90%; max-height:80vh; overflow-y:auto;
+      box-shadow:0 0 20px rgba(0,0,0,0.5);
     }
-    
-    .sp-title {
-      color: #fff;
-      font-size: 24px;
-      margin-bottom: 20px;
-      text-align: center;
-      text-shadow: 2px 2px 0 #000;
-    }
-    
-    .world-list {
-      margin-bottom: 20px;
-      max-height: 300px;
-      overflow-y: auto;
-      border: 1px solid #555;
-      background: #222;
-    }
-    
-    .world-item {
-      padding: 15px;
-      border-bottom: 1px solid #444;
-      cursor: pointer;
-      transition: background 0.2s;
-      color: #fff;
-    }
-    
-    .world-item:hover { background: #444; }
-    .world-item:active { background: #555; }
-    
-    .world-name { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-    .world-info { font-size: 12px; color: #aaa; }
-    
-    .sp-button {
-      background: #666;
-      color: #fff;
-      border: 2px solid #888;
-      padding: 10px 20px;
-      margin: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-    
-    .sp-button:hover { background: #777; border-color: #aaa; }
-    .sp-button:active { background: #555; }
-    
-    .sp-button.primary { background: #4a4; border-color: #6c6; }
-    .sp-button.primary:hover { background: #5b5; border-color: #8e8; }
-    .sp-button.danger { background: #a44; border-color: #c66; }
-    .sp-button.danger:hover { background: #b55; border-color: #e88; }
-    
-    .button-row { display: flex; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
-    .no-worlds { padding: 30px; text-align: center; color: #888; font-style: italic; }
-    
-    #create-world-form { display: none; margin-top: 20px; padding: 15px; background: #222; border: 1px solid #555; }
-    #create-world-form.active { display: block; }
-    #create-world-form input { width: 100%; padding: 10px; margin: 10px 0; background: #333; border: 1px solid #555; color: #fff; font-size: 16px; font-family: inherit; box-sizing: border-box; }
-    #create-world-form label { color: #fff; display: block; margin-top: 10px; }
+    .sp-title { color:#fff; font-size:24px; margin-bottom:20px; text-align:center; text-shadow:2px 2px 0 #000; }
+    .world-list { margin-bottom:20px; max-height:300px; overflow-y:auto; border:1px solid #555; background:#222; }
+    .world-item { padding:15px; border-bottom:1px solid #444; cursor:pointer; transition: background 0.2s; color:#fff; }
+    .world-item:hover { background:#444; } .world-item:active { background:#555; }
+    .world-name { font-size:18px; font-weight:bold; margin-bottom:5px; }
+    .world-info { font-size:12px; color:#aaa; }
+    .sp-button { background:#666; color:#fff; border:2px solid #888; padding:10px 20px; margin:5px; cursor:pointer; font-size:16px; transition:all 0.2s; font-family:inherit; }
+    .sp-button:hover { background:#777; border-color:#aaa; } .sp-button:active { background:#555; }
+    .sp-button.primary { background:#4a4; border-color:#6c6; } .sp-button.primary:hover { background:#5b5; border-color:#8e8; }
+    .sp-button.danger { background:#a44; border-color:#c66; } .sp-button.danger:hover { background:#b55; border-color:#e88; }
+    .button-row { display:flex; justify-content:center; flex-wrap:wrap; margin-top:15px; }
+    .no-worlds { padding:30px; text-align:center; color:#888; font-style:italic; }
+    #create-world-form { display:none; margin-top:20px; padding:15px; background:#222; border:1px solid #555; }
+    #create-world-form.active { display:block; }
+    #create-world-form input { width:100%; padding:10px; margin:10px 0; background:#333; border:1px solid #555; color:#fff; font-size:16px; font-family:inherit; box-sizing:border-box; }
+    #create-world-form label { color:#fff; display:block; margin-top:10px; }
 
-    /* ======== Floating Single Player Button ======== */
+    /* Floating Single Player Button */
     .sp-float-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 99999; /* Always on top */
-      background: #4a4;
-      border: 2px solid #6c6;
-      color: #fff;
-      font-family: 'Minecraft', monospace, sans-serif;
-      font-size: 16px;
-      padding: 12px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      transition: all 0.2s;
+      position: fixed; top:20px; right:20px; z-index:99999;
+      background:#4a4; border:2px solid #6c6; color:#fff;
+      font-family:'Minecraft', monospace, sans-serif; font-size:16px;
+      padding:12px 20px; border-radius:8px; cursor:pointer;
+      box-shadow:0 0 10px rgba(0,0,0,0.5); transition:all 0.2s;
+      display:none; /* hidden until server loaded */
     }
-
-    .sp-float-btn:hover { background: #5b5; border-color: #8e8; }
-    .sp-float-btn:active { background: #3a3; }
+    .sp-float-btn:hover { background:#5b5; border-color:#8e8; }
+    .sp-float-btn:active { background:#3a3; }
   </style>
 </head>
 <body style="margin:0;width:100vw;height:100vh;" id="game_frame">
@@ -144,24 +78,19 @@
   <div id="singleplayer-menu">
     <div class="sp-container">
       <div class="sp-title">Select World</div>
-      
       <div class="world-list" id="world-list">
         <div class="no-worlds">No worlds yet. Create a new world to get started!</div>
       </div>
-      
       <div id="create-world-form">
         <label for="world-name-input">World Name:</label>
         <input type="text" id="world-name-input" placeholder="My World" maxlength="32" />
-        
         <label for="world-seed-input">Seed (optional):</label>
         <input type="text" id="world-seed-input" placeholder="Leave blank for random" />
-        
         <div class="button-row">
           <button class="sp-button primary" onclick="createWorld()">Create World</button>
           <button class="sp-button" onclick="cancelCreateWorld()">Cancel</button>
         </div>
       </div>
-      
       <div class="button-row">
         <button class="sp-button primary" onclick="showCreateWorldForm()">Create New World</button>
         <button class="sp-button" onclick="closeSinglePlayerMenu()">Back to Menu</button>
@@ -176,123 +105,131 @@
 var name="PixelCraft", motd="A public 1.5.2 server", ip="pixelcraft.me";
 
 // === Floating button handler ===
-function openSinglePlayerAndHide() {
-    const btn = document.getElementById('open-singleplayer-btn');
-    btn.style.display = 'none'; // hide after click
-    showSinglePlayerMenu();     // open menu
+function openSinglePlayerAndHide(){
+  document.getElementById('open-singleplayer-btn').style.display='none';
+  showSinglePlayerMenu();
 }
 
-// === World storage management ===
-const WORLDS_KEY = 'minecraft_worlds';
-function getWorlds() { try { const worlds = localStorage.getItem(WORLDS_KEY); return worlds ? JSON.parse(worlds) : []; } catch(e) { console.error('Error loading worlds:', e); return []; } }
-function saveWorlds(worlds) { try { localStorage.setItem(WORLDS_KEY, JSON.stringify(worlds)); return true; } catch(e) { console.error('Error saving worlds:', e); alert('Failed to save world data. Your browser storage may be full.'); return false; } }
+// === Show/hide menu ===
+function showSinglePlayerMenu(){
+  const menu=document.getElementById('singleplayer-menu');
+  menu.classList.add('active');
+  refreshWorldList();
+  if(document.exitPointerLock) document.exitPointerLock();
+}
+function closeSinglePlayerMenu(){
+  const menu=document.getElementById('singleplayer-menu');
+  menu.classList.remove('active');
+  document.getElementById('create-world-form').classList.remove('active');
+  document.getElementById('open-singleplayer-btn').style.display='block';
+}
 
-function showSinglePlayerMenu() {
-    const menu = document.getElementById('singleplayer-menu');
-    menu.classList.add('active');
+// === World storage ===
+const WORLDS_KEY='minecraft_worlds';
+function getWorlds(){ try{ const w=localStorage.getItem(WORLDS_KEY); return w?JSON.parse(w):[]; }catch(e){console.error(e); return[];} }
+function saveWorlds(worlds){ try{ localStorage.setItem(WORLDS_KEY,JSON.stringify(worlds)); return true; }catch(e){alert('Failed to save world'); return false;} }
+
+function refreshWorldList(){
+  const worlds=getWorlds();
+  const worldList=document.getElementById('world-list');
+  if(worlds.length===0){ worldList.innerHTML='<div class="no-worlds">No worlds yet. Create a new world to get started!</div>'; return; }
+  worldList.innerHTML='';
+  worlds.forEach((w,i)=>{
+    const item=document.createElement('div');
+    item.className='world-item';
+    item.onclick=()=>loadWorld(i);
+    const nameDiv=document.createElement('div'); nameDiv.className='world-name'; nameDiv.textContent=w.name;
+    const infoDiv=document.createElement('div'); infoDiv.className='world-info'; infoDiv.textContent=`Created: ${new Date(w.created).toLocaleString()}`;
+    if(w.lastPlayed) infoDiv.textContent+=` | Last played: ${new Date(w.lastPlayed).toLocaleString()}`;
+    item.appendChild(nameDiv); item.appendChild(infoDiv);
+    const delBtn=document.createElement('button'); delBtn.className='sp-button danger'; delBtn.style.marginTop='10px'; delBtn.textContent='Delete';
+    delBtn.onclick=(e)=>{ e.stopPropagation(); deleteWorld(i); };
+    item.appendChild(delBtn);
+    worldList.appendChild(item);
+  });
+}
+
+function showCreateWorldForm(){ document.getElementById('create-world-form').classList.add('active'); document.getElementById('world-name-input').focus(); }
+function cancelCreateWorld(){ document.getElementById('create-world-form').classList.remove('active'); document.getElementById('world-name-input').value=''; document.getElementById('world-seed-input').value=''; }
+
+// === Create & auto-load world ===
+function createWorld(){
+  const nameInput=document.getElementById('world-name-input');
+  const seedInput=document.getElementById('world-seed-input');
+  const worldName=nameInput.value.trim()||'New World';
+  const worldSeed=seedInput.value.trim()||null;
+  const worlds=getWorlds();
+  const newWorld={ name:worldName, seed:worldSeed, created:Date.now(), lastPlayed:Date.now() };
+  worlds.push(newWorld);
+  if(saveWorlds(worlds)){
+    cancelCreateWorld();
     refreshWorldList();
-    if(document.exitPointerLock) document.exitPointerLock();
-}
-function closeSinglePlayerMenu() {
-    const menu = document.getElementById('singleplayer-menu');
-    menu.classList.remove('active');
-    document.getElementById('create-world-form').classList.remove('active');
+    closeSinglePlayerMenu();
+    startSinglePlayerWithWorld(newWorld);
+    console.log('World created & loaded:',newWorld);
+  }
 }
 
-function refreshWorldList() {
-    const worlds = getWorlds();
-    const worldList = document.getElementById('world-list');
-    if(worlds.length===0){ worldList.innerHTML='<div class="no-worlds">No worlds yet. Create a new world to get started!</div>'; return; }
-    worldList.innerHTML='';
-    worlds.forEach((world,index)=>{
-        const worldItem=document.createElement('div');
-        worldItem.className='world-item';
-        worldItem.onclick=()=>loadWorld(index);
-        const worldName=document.createElement('div');
-        worldName.className='world-name';
-        worldName.textContent=world.name;
-        const worldInfo=document.createElement('div');
-        worldInfo.className='world-info';
-        worldInfo.textContent=`Created: ${new Date(world.created).toLocaleString()}`;
-        if(world.lastPlayed) worldInfo.textContent+=` | Last played: ${new Date(world.lastPlayed).toLocaleString()}`;
-        worldItem.appendChild(worldName);
-        worldItem.appendChild(worldInfo);
-        const deleteBtn=document.createElement('button');
-        deleteBtn.className='sp-button danger';
-        deleteBtn.textContent='Delete';
-        deleteBtn.style.marginTop='10px';
-        deleteBtn.onclick=(e)=>{ e.stopPropagation(); deleteWorld(index); };
-        worldItem.appendChild(deleteBtn);
-        worldList.appendChild(worldItem);
-    });
-}
-
-function showCreateWorldForm() { document.getElementById('create-world-form').classList.add('active'); document.getElementById('world-name-input').focus(); }
-function cancelCreateWorld() { document.getElementById('create-world-form').classList.remove('active'); document.getElementById('world-name-input').value=''; document.getElementById('world-seed-input').value=''; }
-
-// === NEW: Create + auto-load world ===
-function createWorld() {
-    const nameInput=document.getElementById('world-name-input');
-    const seedInput=document.getElementById('world-seed-input');
-    const worldName=nameInput.value.trim()||'New World';
-    const worldSeed=seedInput.value.trim()||null;
-
-    const worlds=getWorlds();
-    const newWorld={ name: worldName, seed: worldSeed, created: Date.now(), lastPlayed: Date.now() };
-    worlds.push(newWorld);
-
-    if(saveWorlds(worlds)){
-        cancelCreateWorld();
-        refreshWorldList();
-        closeSinglePlayerMenu();
-        startSinglePlayerWithWorld(newWorld);
-        console.log('World created and loaded:', newWorld);
-    }
-}
-
-function deleteWorld(index){ if(!confirm('Are you sure you want to delete this world? This cannot be undone!')) return; const worlds=getWorlds(); const deletedWorld=worlds.splice(index,1)[0]; if(saveWorlds(worlds)) refreshWorldList(); console.log('World deleted:', deletedWorld); }
-function loadWorld(index){ const worlds=getWorlds(); const world=worlds[index]; if(!world) return alert('World not found!'); world.lastPlayed=Date.now(); saveWorlds(worlds); closeSinglePlayerMenu(); startSinglePlayerWithWorld(world); }
+function deleteWorld(i){ if(!confirm('Delete this world?')) return; const worlds=getWorlds(); worlds.splice(i,1); saveWorlds(worlds); refreshWorldList(); }
+function loadWorld(i){ const worlds=getWorlds(); const w=worlds[i]; if(!w) return alert('World not found'); w.lastPlayed=Date.now(); saveWorlds(worlds); closeSinglePlayerMenu(); startSinglePlayerWithWorld(w); }
 
 function startSinglePlayerWithWorld(world){
-    console.log('Starting single player mode with world:',world.name);
-    if(typeof classes!=='undefined' && classes.server){
-        try{
-            if(typeof classes.server.createWorld==='function'){
-                classes.server.createWorld(world.name,world.seed||null);
-                classes.server.start(world.seed||null);
-            } else classes.server.start(world.seed||null);
-            console.log('✓ Single player world loaded:',world.name);
-        } catch(e){ console.error('Error starting single player:',e); alert('Failed to start single player: '+e.message); }
-    } else if(typeof startIntegratedServer==='function'){
-        startIntegratedServer(world.seed||null);
-    } else{ console.error('Single player classes not loaded'); alert('Single player not available. Ensure classes_server.js is loaded.'); }
+  console.log('Starting single player:',world.name);
+  if(typeof classes!=='undefined' && classes.server){
+    try{
+      if(typeof classes.server.createWorld==='function'){ classes.server.createWorld(world.name,world.seed||null); classes.server.start(world.seed||null); }
+      else classes.server.start(world.seed||null);
+      console.log('✓ Single player loaded:',world.name);
+    }catch(e){ console.error(e); alert('Failed to start single player: '+e.message);}
+  }else if(typeof startIntegratedServer==='function'){ startIntegratedServer(world.seed||null); }
+  else{ console.error('classes_server.js not loaded'); alert('Single player unavailable.'); }
 }
 
-// === Game Loading ===
-function loadScript(src,required=true){ return new Promise((resolve,reject)=>{ const script=document.createElement('script'); script.src=src; script.onload=()=>resolve(src); script.onerror=(e)=>{ if(required) reject(new Error(`Failed to load required file: ${src}`)); else resolve(null); }; document.head.appendChild(script); }); }
+// === Dynamically load classes_server.js ===
+function loadServerClasses(){
+  return new Promise((resolve,reject)=>{
+    if(typeof classes!=='undefined' && classes.server){ resolve(); return; }
+    const script=document.createElement('script');
+    script.src='classes_server.js';
+    script.onload=()=>{ if(typeof classes!=='undefined' && classes.server){ resolve(); } else reject(new Error('classes.server not found')); };
+    script.onerror=(e)=>reject(new Error('Failed to load classes_server.js'));
+    document.head.appendChild(script);
+  });
+}
+
+// === Initialize single player button after server loaded ===
+loadServerClasses().then(()=>{
+  const btn=document.getElementById('open-singleplayer-btn');
+  btn.style.display='block';
+  console.log('✓ Single Player ready');
+}).catch(err=>{
+  console.error('❌ Single Player unavailable:',err);
+  document.getElementById('open-singleplayer-btn').style.display='none';
+  alert('Single Player unavailable. Ensure classes_server.js is present.');
+});
+
+// === Game loading (modded.js) ===
+function loadScript(src,required=true){ return new Promise((resolve,reject)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>resolve(); s.onerror=(e)=>required?reject(new Error(src)):resolve(); document.head.appendChild(s); }); }
 
 loadScript('modded.js',true).then(()=>{ setTimeout(()=>{ initGame(); },100); }).catch(error=>{
-    document.getElementById('game_frame').innerHTML='<div style="color:red;padding:20px;font-family:sans-serif;"><strong>Error loading modded.js</strong><br>'+error.message+'</div>';
+  document.getElementById('game_frame').innerHTML='<div style="color:red;padding:20px;font-family:sans-serif;"><strong>Error loading modded.js</strong><br>'+error.message+'</div>';
 });
 
 function initGame(){
-    const relayId=Math.floor(Math.random()*3);
-    window.eaglerRelays=[{addr:"wss://relay.deev.is/",name:"relay #1",primary:relayId==0},{addr:"wss://relay.lax1dude.net/",name:"relay #2",primary:relayId==1},{addr:"wss://relay.shhnowisnottheti.me/",name:"relay #3",primary:relayId==2}];
-    window.minecraftOpts=["game_frame","assets.epk",btoa(atob("CgAACQAHc2VydmVycwoAAAABCAAKZm9yY2VkTU9URABtb3RkaGVyZQEAC2hpZGVBZGRyZXNzAQgAAmlwAGlwaGVyZQgABG5hbWUAbmFtZWhlcmUAAA==").replace("motdhere",String.fromCharCode(motd.length)+motd).replace("namehere",String.fromCharCode(name.length)+name).replace("iphere",String.fromCharCode(ip.length)+ip))];
-    window.singlePlayerEnabled=true;
-    var q=new URLSearchParams(window.location.search); if(q.has("server")) window.minecraftOpts.push(q.get("server"));
-    if(typeof main==='function'){ main(); setTimeout(()=>setupSinglePlayerHook(),2000); }
-    else document.getElementById('game_frame').innerHTML='<div style="color:red;padding:20px;font-family:sans-serif;">Error: main() not found</div>';
+  const relayId=Math.floor(Math.random()*3);
+  window.eaglerRelays=[
+    {addr:"wss://relay.deev.is/",name:"relay #1",primary:relayId==0},
+    {addr:"wss://relay.lax1dude.net/",name:"relay #2",primary:relayId==1},
+    {addr:"wss://relay.shhnowisnottheti.me/",name:"relay #3",primary:relayId==2}
+  ];
+  window.minecraftOpts=["game_frame","assets.epk"];
+  window.singlePlayerEnabled=true;
+  if(typeof main==='function'){ main(); setTimeout(()=>setupSinglePlayerHook(),2000); }
+  else document.getElementById('game_frame').innerHTML='<div style="color:red;padding:20px;font-family:sans-serif;">Error: main() not found</div>';
 }
-
-function setupSinglePlayerHook(){
-    window.singlePlayerAvailable=(typeof classes!=='undefined'&&classes.server)||typeof startIntegratedServer==='function';
-    if(window.singlePlayerAvailable) console.log('✓ Single player ready');
-    else console.warn('⚠ classes.server.js missing');
-}
+function setupSinglePlayerHook(){ window.singlePlayerAvailable=(typeof classes!=='undefined' && classes.server) || typeof startIntegratedServer==='function'; if(window.singlePlayerAvailable) console.log('✓ Single player ready'); else console.warn('⚠ classes.server.js missing'); }
 
 window.openSinglePlayer=showSinglePlayerMenu;
-
 document.addEventListener('keydown',(e)=>{ if(e.key==='F2'){ e.preventDefault(); showSinglePlayerMenu(); } });
 </script>
 </body>
