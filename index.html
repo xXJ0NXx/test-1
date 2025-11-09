@@ -46,28 +46,61 @@ function loadScript(src, required = true) {
   });
 }
 
+// Load scripts dynamically - both files are required
+function loadScript(src, required = true) {
+  return new Promise((resolve, reject) => {
+    console.log(`Attempting to load: ${src}`);
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = () => {
+      console.log(`✓ Successfully loaded: ${src}`);
+      resolve(src);
+    };
+    script.onerror = (e) => {
+      console.error(`✗ Failed to load: ${src}`, e);
+      if (required) {
+        reject(new Error(`Failed to load required file: ${src}`));
+      } else {
+        console.warn(`Optional script not loaded: ${src}`);
+        resolve(null);
+      }
+    };
+    document.head.appendChild(script);
+  });
+}
+
 // Load unmodded.js first, then modded.js sequentially to combine them
-loadScript('unmodded.js').then((unmoddedResult) => {
-  if (!unmoddedResult) {
-    throw new Error('unmodded.js failed to load - this file is required');
-  }
-  console.log('✓ unmodded.js loaded (vanilla base)');
+console.log('Starting game file loading sequence...');
+
+// Show loading indicator
+document.getElementById('game_frame').innerHTML = '<div id="loading-status" style="color:white;padding:20px;font-family:monospace;background:#000;">Loading game files...</div>';
+
+loadScript('unmodded.js', true).then(() => {
+  console.log('✓ Base classes loaded from unmodded.js');
+  document.getElementById('loading-status').innerHTML += '<br>✓ unmodded.js loaded (vanilla base)';
+  console.log('Now loading modded.js...');
   
   // Now load modded.js - it will merge with/override unmodded classes
-  return loadScript('modded.js');
-}).then((moddedResult) => {
-  if (!moddedResult) {
-    throw new Error('modded.js failed to load - this file is required');
-  }
-  console.log('✓ modded.js loaded (merged with base)');
-  console.log('✓ Combined mode active: unmodded.js + modded.js');
+  return loadScript('modded.js', true);
+}).then(() => {
+  console.log('✓ Modifications loaded from modded.js');
+  document.getElementById('loading-status').innerHTML += '<br>✓ modded.js loaded (modifications)';
+  console.log('✓✓ Combined mode active: unmodded.js + modded.js');
+  console.log('Initializing game...');
   
-  // Both files loaded and combined, initialize game
-  initGame();
+  // Show final status before starting game
+  document.getElementById('loading-status').innerHTML += '<br><br>✓✓ Both files combined successfully!<br>Starting game...';
+  
+  setTimeout(() => {
+    // Both files loaded and combined, initialize game
+    initGame();
+  }, 1000); // Brief delay so you can see the message
 }).catch((error) => {
-  console.error('Failed to load game files:', error);
+  console.error('❌ FATAL ERROR during file loading:', error);
   document.getElementById('game_frame').innerHTML = 
-    '<div style="color:red;padding:20px;font-family:sans-serif;"><strong>Error: Game files failed to load</strong><br><br>' + error.message + '<br><br>Please ensure both unmodded.js and modded.js are present.</div>';
+    '<div style="color:red;padding:20px;font-family:sans-serif;"><strong>Error: Game files failed to load</strong><br><br>' + error.message + '<br><br>Please ensure both unmodded.js and modded.js are present in the same directory as this HTML file.<br><br>Check the browser console (F12) for more details.</div>';
+});').innerHTML = 
+    '<div style="color:red;padding:20px;font-family:sans-serif;"><strong>Error: Game files failed to load</strong><br><br>' + error.message + '<br><br>Please ensure both unmodded.js and modded.js are present in the same directory as this HTML file.</div>';
 });
 
 function initGame() {
